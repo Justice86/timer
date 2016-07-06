@@ -1,0 +1,25 @@
+body {
+    margin-top: 100px;
+    text-align: center;
+}
+
+.btn {
+    margin: 5px;
+    width: 100px;
+    padding: 10px;
+    border: 1px solid #f453aa;
+    border-radius: 3px;
+    background-color: #df543a;
+    color: #546421;
+    font-size: 20px;
+}
+
+.col-md-2 {
+    width: 180px;
+    margin-left: 527px;
+    padding: 10px;
+    border: 5px solid #00d546;
+    background-color: #ffe4ce;
+    font-size: 32px;
+    font-weight: 700;
+}

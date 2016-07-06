@@ -1,58 +1,111 @@
-var base = 60;
-var clocktimer,dateObj,dh,dm,ds,ms;
-var readout='';
-var h=1, m=1, tm=1,s=0,ts=0,ms=0,show=true, init=0, ii=0;
-//функция для очистки поля
-function clearClock() {
-    clearTimeout(clocktimer);
-    h=1;m=1;tm=1;s=0;ts=0;ms=0;
-    init=0;show=true;
-    readout='00:00:00.00';
-    document.TestForm.stopwatch.value=readout;
-    ii = 0;
+function div (divName) {
+    var divName = document.createElement('div');
+    document.body.appendChild(divName);
+    return divName;
 }
-//функция для старта секундомера
-function startTIME() {
-    var cdateObj = new Date();
-    var t = (cdateObj.getTime() - dateObj.getTime())-(s*1000);
-    if (t>999) { s++; }
-    if (s>=(m*base)) {
-        ts=0;
-        m++;
-    } else {
-        ts=parseInt((ms/100)+s);
-        if(ts>=base) { ts=ts-((m-1)*base); }
-    }
-    if (m>(h*base)) {
-        tm=1;
-        h++;
-    } else {
-        tm=parseInt((ms/100)+m);
-        if(tm>=base) { tm=tm-((h-1)*base); }
-    }
-    ms = Math.round(t/10);
-    if (ms>99) {ms=0;}
-    if (ms==0) {ms='00';}
-    if (ms>0&&ms<=9) { ms = '0'+ms; }
-    if (ts>0) { ds = ts; if (ts<10) { ds = '0'+ts; }} else { ds = '00'; }
-    dm=tm-1;
-    if (dm>0) { if (dm<10) { dm = '0'+dm; }} else { dm = '00'; }
-    dh=h-1;
-    if (dh>0) { if (dh<10) { dh = '0'+dh; }} else { dh = '00'; }
-    readout = dh + ':' + dm + ':' + ds + '.' + ms;
-    if (show==true) { document.TestForm.stopwatch.value = readout; }
-    clocktimer = setTimeout("startTIME()",1);
-}
-//функция для паузы
-function pause() {
 
-    if (init==0) { dateObj = new Date();
-        startTIME();
-        init=1;
-        document.getElementById("watch").value = 'Pause';
-    } else { if(show==true) {
-        show=false;
-    } else { show=true; }
-        document.getElementById("watch").value = 'Start';
+var divForTimeTable = div(divForTimeTable);
+var divForStartReset = div(divForStartReset);
+
+var timeTable = document.createElement('div');
+divForTimeTable.appendChild(timeTable);
+timeTable.innerHTML = '00:00:00:000';
+timeTable.classList.add('col-md-2', 'col-md-offset-5', 'text-center');
+
+var startButton = document.createElement('button');
+divForStartReset.appendChild(startButton);
+startButton.classList.add('btn', 'btn-danger', 'col-md-1', 'col-md-offset-5');
+startButton.setAttribute('type', 'button');
+startButton.innerHTML = 'Start';
+startButton.addEventListener("click", startTimer);
+
+var resetButton = document.createElement('button');
+divForStartReset.appendChild(resetButton);
+resetButton.classList.add('btn', 'btn-danger', 'col-md-1');
+resetButton.setAttribute('type', 'button');
+resetButton.innerHTML = 'Stop';
+resetButton.addEventListener("click", resetTimer);
+
+var zero = new Date(0, 0),
+    seconds = 0,
+    minutes = 0,
+    hours = 0,
+    timer,
+    time;
+
+function countTime() {
+    zero.setMilliseconds( zero.getMilliseconds() + 4);
+    var milliseconds = zero.getMilliseconds();
+
+    if ( milliseconds === 996) {
+        ++seconds;
     }
+
+    if (seconds >= 60) {
+        seconds = 0;
+        ++minutes;
+    }
+
+    if (minutes >= 60) {
+        minutes = 0;
+        ++hours;
+    }
+
+    if (seconds < 10) {
+        secondsNum = '0' + seconds;
+    } else {
+        secondsNum = seconds;
+    }
+
+    if (minutes < 10) {
+        minutesNum = '0' + minutes;
+    } else {
+        minutesNum = minutes;
+    }
+
+    if (hours < 10) {
+        hoursNum = '0' + hours;
+    } else {
+        hoursNum = hours;
+    }
+
+    time = hoursNum + ':' + minutesNum + ':' + secondsNum + ':' + milliseconds;
+    timeTable.innerHTML = time;
+}
+
+function startTimer(){
+    startButton.classList.add('btn', 'btn-primary');
+    startButton.classList.remove('btn-danger', 'btn-success');
+    startButton.innerHTML = 'Pause';
+    timer = setInterval(countTime, 4);
+    startButton.removeEventListener("click", startTimer);
+    startButton.addEventListener("click", pauseTimer);
+}
+
+function pauseTimer(){
+    startButton.classList.add('btn-success');
+    startButton.classList.remove('btn-primary');
+    startButton.innerHTML = 'Start';
+    clearInterval(timer);
+    timeTable.innerHTML = time;
+    startButton.removeEventListener("click", pauseTimer);
+    startButton.addEventListener("click", startTimer);
+}
+
+function resetTimer(){
+    startButton.classList.remove('btn-primary', 'btn-success');
+    startButton.classList.add('btn-danger');
+    startButton.innerHTML = 'Start';
+    timeTable.innerHTML = '00:00:00:000';
+    clearInterval(timer);
+    startButton.removeEventListener("click", pauseTimer);
+    startButton.addEventListener("click", startTimer);
+    var timestamp = document.querySelectorAll('.test');
+    [].forEach.call(timestamp, function(el) {
+        el.parentNode.removeChild(el);
+    });
+    zero = new Date(0, 0);
+    seconds = 0;
+    minutes = 0;
+    hours = 0;
 }
